@@ -1,0 +1,58 @@
+{
+	"index.html": {
+		"resources": [
+			"chat-list.html"
+		],
+		"refer": [
+			"chat-me.html",
+			"chat-contact.html",
+			"chat-discover.html",
+			"chat-list.html"
+		]
+	},
+	"login.html": {
+		"refer": [
+			"login.html",
+			"index.html"
+		]
+	},
+	"chat-me.html": {
+		"refer": [
+			"chat-me-herder-img.html",
+			"chat-me-nick-name.html",
+			"chat-me-qr-code.html",
+			"login.html"
+		]
+	},
+	"chat-me-herder-img.html": {
+		"refer": [
+			"plugin/v3.1.6/myface-uploader.html"
+		]
+	},
+	"chat-discover.html": {
+		"refer": [
+			"chat-discover-search-friends.html",
+			"chat-discover-scanme.html"
+		]
+	},
+	"chat-discover-search-friends.html": {
+		"refer": [
+			"chat-discover-add-friends.html"
+		]
+	},
+	"chat-contact.html": {
+		"refer": [
+			"chat-list-chatting.html"
+		]
+	},
+	"chat-discover-scanme.html": {
+		"refer": [
+			"chat-discover-add-friends.html"
+		]
+	},
+	"chat-list.html": {
+		"refer": [
+			"chat-list-chatting.html"
+		]
+	}
+}

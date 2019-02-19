@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link href="css/header.css" rel="stylesheet" />
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav title">
+		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" style="color: white;"></a>
+		    <a id="choose_img_action" class="mui-icon mui-icon-right-nav mui-pull-right" style="color: white;line-height: 18px;margin-right: 3px;">...</a>
+		    <h1 class="mui-title title-color"><b>微 聊</b></h1> 
+		</header>
+		<div class="mui-content">
+			<img id="header_img" src="" />
+		</div>
+		<div id="sheet_header_img" class="mui-popover mui-popover-bottom mui-popover-action ">
+		    <!-- 可选择菜单 -->
+		    <ul class="mui-table-view">
+		      <li class="mui-table-view-cell">
+		        <a id="choose_herder_img" href="#">更改头像</a>
+		      </li>
+		      <li class="mui-table-view-cell">
+		        <a id="save_herder_img" href="#">保存到手机</a>
+		      </li>
+		    </ul>
+		    <!-- 取消菜单 -->
+		    <ul class="mui-table-view">
+		      <li class="mui-table-view-cell">
+		        <a href="#sheet_header_img"><b>取消</b></a>
+		      </li>
+		    </ul>
+		</div>
+		
+		<script src="js/mui.min.js"></script>
+		<script src="js/app.js"></script>
+		<script type="text/javascript">
+			mui.init()
+			var headerImgSrc;
+			mui.plusReady(function(){
+				initHerderImg();
+				
+				//别的 webview 调用来刷新用户信息
+				window.addEventListener("refresh",function(){
+					initHerderImg();
+				});
+				//三个点的操作
+				var chooseImgAction = document.getElementById("choose_img_action");
+				chooseImgAction.addEventListener("tap",function(){
+					mui("#sheet_header_img").popover("toggle");
+				});
+				
+				//更换头像
+				var chooseHerderImg = document.getElementById("choose_herder_img");
+				chooseHerderImg.addEventListener("tap",function(){
+					mui("#sheet_header_img").popover("hide");
+					mui.openWindow({url:"plugin/v3.1.6/myface-uploader.html",id:"myface-uploader.html", createNew:true})
+				});
+				
+				//保存头像
+				var saveHerderImg = document.getElementById("save_herder_img");
+				saveHerderImg.addEventListener("tap",function(){
+					plus.nativeUI.showWaiting("保存中");
+					mui("#sheet_header_img").popover("hide");
+					var tast = plus.downloader.createDownload(app.imgServerUrl+headerImgSrc,
+					{},function(downloadFile,status){
+						plus.nativeUI.closeWaiting();
+						if(status==200){
+							var tempFile = downloadFile.filename;
+							plus.gallery.save(tempFile,function(){
+								app.showToast("保存成功","success");
+							});
+						}else{
+							app.showToast("保存失败","error");
+						}
+					});
+					tast.start();
+				});
+			});
+			function initHerderImg(){
+				
+				var herderImg = document.getElementById("header_img");
+				headerImgSrc = app.getUserGlobalInfo().faceImageBig;
+				if(app.isNotNull(headerImgSrc)){
+					herderImg.src=app.imgServerUrl+headerImgSrc;
+				}
+				//获取屏幕宽度
+				var imgWeight = document.body.clientWidth;
+				herderImg.height=imgWeight;
+				herderImg.weight=imgWeight;
+			}
+		</script>
+	</body>
+
+</html>

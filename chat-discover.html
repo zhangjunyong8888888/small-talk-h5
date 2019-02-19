@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+	</head>
+		<div class="mui-content">
+		    <ul class="mui-table-view">
+		        <li class="mui-table-view-cell mui-media">
+	                <img class="mui-media-object mui-pull-left" src="image/friends.png" 
+	                	style="max-width: 25px;height: 25px;">
+	                    <p class="mui-ellipsis"><span style="line-height: 25px;font-size: 16px;color: #000000;margin-left: 10px;">朋友圈</span></p>
+		        </li>
+		    </ul>
+		    <br />
+		    <ul class="mui-table-view">
+				<li id="search_friends" class="mui-table-view-cell mui-media">
+	                <img class="mui-media-object mui-pull-left" src="image/addfriends.png" 
+	                	style="max-width: 25px;height: 25px;">
+	                    <p class="mui-ellipsis"><span style="line-height: 25px;font-size: 16px;color: #000000;margin-left: 10px;">添加好友</span></p>
+		        </li>
+		        <li id="scanme" class="mui-table-view-cell mui-media">
+	                <img class="mui-media-object mui-pull-left" src="image/scanscan.png" 
+	                	style="max-width: 25px;height: 25px;">
+	                    <p class="mui-ellipsis"><span style="line-height: 25px;font-size: 16px;color: #000000;margin-left: 10px;">扫一扫</span></p>
+		        </li>
+		    </ul>
+		</div>
+	<body>
+		<script src="js/mui.min.js"></script>
+		<script type="text/javascript">
+			mui.init()
+			mui.plusReady(function (){
+				var searchFriends = document.getElementById("search_friends");
+				searchFriends.addEventListener("tap",function(){
+					mui.openWindow("chat-discover-search-friends.html","chat-discover-search-friends.html");
+				});
+				var scanme = document.getElementById("scanme");
+				scanme.addEventListener("tap",function(){
+					mui.openWindow("chat-discover-scanme.html","chat-discover-scanme.html");
+				});
+			});
+		</script>
+	</body>
+
+</html>

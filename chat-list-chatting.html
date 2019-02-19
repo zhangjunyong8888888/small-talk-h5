@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="css/header.css" />
+		<link rel="stylesheet" type="text/css" href="css/chat.css" />
+		<style>
+			html,
+			body {
+				height: 100%;
+				margin: 0px;
+				padding: 0px;
+				overflow: hidden;
+				-webkit-touch-callout: none;
+				-webkit-user-select: none;
+			}
+		</style>
+	</head>
+
+	<body contextmenu="return false;">
+
+		<header class="mui-bar mui-bar-nav title" style="position: fixed;">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left title-color"></a>
+			<h1 class="mui-title title-color"><b id="chatting_nickname">微  聊</b></h1>
+		</header>
+
+		<div id="msg-outter" class="mui-content">
+			<div id='msg'>
+			</div>
+		</div>
+		
+		<footer>
+			<div class="footer-center">
+				<textarea id='msg_text' type="text" class='input-text'></textarea>
+			</div>
+			<label for="" class="footer-right">
+				<button type="button" class="mui-btn mui-btn-gray" id="send">发送</button>
+			</label>
+		</footer>
+		
+		<script src="js/mui.min.js"></script>
+		<script type="application/javascript" src="js/app.js"></script>
+		<script type="text/javascript">
+			var friendNickname;
+			var friendUserId;
+			var friendFaceImage;
+			mui.plusReady(function(){
+				var userInfo = app.getUserGlobalInfo();
+				var thisWebview = plus.webview.currentWebview();
+				//初始化 好友信息
+				friendNickname = thisWebview.friendNickname;
+				friendUserId=thisWebview.friendUserId;
+				friendFaceImage=app.imgServerUrl + thisWebview.friendFaceImage;
+				thisWebview.setStyle({
+					softinputMode:"adjustResize"
+				});
+				// 初始化 聊天记录
+				initChatHistory();
+				//初始化 屏幕
+				resetScreen();
+				//监听当前窗口resize
+				window.addEventListener("resize",function(){
+					resetScreen();
+					document.getElementById("msg-outter").style.paddingBottom="50px";
+				});
+				//更改页面昵称
+				document.getElementById("chatting_nickname").innerHTML=friendNickname;
+				
+				
+				var msgText = document.getElementById("msg_text");
+				var sendBtn = document.getElementById("send");
+				//监听发送按钮颜色
+				msgText.addEventListener("input",function(){
+					if(msgText.value.length>0){
+						sendBtn.setAttribute("class","mui-btn-green");
+					}else{
+						sendBtn.setAttribute("class","mui-btn-gray");
+					}
+				});
+				//发送消息
+				sendBtn.addEventListener("tap",function(){
+					var msgTextValue = msgText.value;
+					if(msgTextValue.length==0){
+						return;
+					}
+					var netWorkType = plus.networkinfo.getCurrentType();
+					if(netWorkType==0 || netWorkType==1){
+						app.showToast("请打开网络连接","error");
+						return;
+					}
+					sendMsg(app.imgServerUrl + userInfo.faceImage,msgTextValue);
+					var wsWebview = plus.webview.getWebviewById("chat-list.html");
+					var chatMsg = new app.ChatMsg(userInfo.id,friendUserId,msgTextValue,null);
+					var dataContent = new app.DataContent(app.CHAT,chatMsg,null);
+					wsWebview.evalJS("CHAT.chat('"+ JSON.stringify(dataContent) +"')");
+					//存储 聊天记录
+					app.saveUserChatHistory(userInfo.id,friendUserId,msgTextValue,1);
+					//更新聊天 快照
+					app.saveUserChatSnapshot(userInfo.id,friendUserId,msgTextValue,true);
+					//清空消息与重置按钮
+					msgText.value="";
+					sendBtn.setAttribute("class","mui-btn-gray");
+				});
+			});
+			
+			//接收消息
+			function receiveMsg(msg){
+				var msgHtml = '<div class="friend_lists">' +
+								'<div class="header_img">' +
+									'<img src="'+friendFaceImage+'" width="40px" height="40px" />' +
+								'</div>' +
+								'<div class="msg-wrapper right">' +
+									'<p class="msg-left-white">'+msg+'</p>' +
+								'</div>' +
+							'</div>';		
+				document.getElementById("msg").insertAdjacentHTML("beforeend",msgHtml);
+				playReceiveMsgMusic();
+			}
+			
+			//发送消息
+			function sendMsg(headImg,msg){
+				var msgHtml = '<div class="me_lists">' +
+								'<div class="header_img">' +
+									'<img src="'+headImg+'" width="40px" height="40px" />' +
+								'</div>' +
+								'<div class="msg-wrapper left">' +
+									'<p class="msg-right-green">'+msg+'</p>' +
+								'</div>' +
+							'</div>';		
+				document.getElementById("msg").insertAdjacentHTML("beforeend",msgHtml);
+				playSendMsgMusic();
+			}
+			function playSendMsgMusic(){
+				var musicPlayer  = plus.audio.createPlayer("/mp3/send.mp3");
+				musicPlayer.play();
+			}
+			function playReceiveMsgMusic(){
+				var musicPlayer  = plus.audio.createPlayer("/mp3/di_didi.mp3");
+				musicPlayer.play();
+			}
+			function resetScreen(){
+				var msgList = document.getElementById("msg");
+				//将滚动条滚到底部
+				msgList.scrollTop = msgList.scrollHeight + msgList.offsetHeight;
+			}
+			// 初始化聊天记录
+			function initChatHistory() {
+				var msg_list = document.getElementById("msg");
+				
+				var me = app.getUserGlobalInfo();
+				var myId = me.id;
+				var myFaceImg = app.imgServerUrl + me.faceImage;
+
+				var chatHistoryList = app.getUserChatHistory(myId, friendUserId);
+				
+				var togetherHTML = "";
+				
+				for (var i = 0 ; i < chatHistoryList.length ; i ++) {
+					var singleMsg = chatHistoryList[i];
+					if (singleMsg.flag == 1) {
+						togetherHTML += '<div class="me_lists">' +
+									'<div class="header_img">' +
+										'<img src="' +  myFaceImg + '" width="40px" height="40px" />' +
+									'</div>' +
+									'<div class="msg-wrapper left">' +
+										'<p class="msg-right-green">' + singleMsg.msg + '</p>' +
+									'</div>' +
+								  '</div>';
+					} else {
+						togetherHTML += '<div class="friend_lists">' +
+										'<div class="header_img">' +
+											'<img src="' + friendFaceImage + '" width="40px" height="40px" />' +
+										'</div>' +
+										'<div class="msg-wrapper right">' +
+											'<p class="msg-left-white">' + singleMsg.msg + '</p>' +
+										'</div>' +
+								  '</div>';
+					}
+				}
+				msg_list.innerHTML = togetherHTML;
+			}
+		</script>
+	</body>
+
+</html>

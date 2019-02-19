@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link href="css/header.css" rel="stylesheet" />
+		<style>
+			#add_friend {
+	        	background-color: #1aad19;
+	        }
+	        #add_friend:active {
+	            background-color: #128e12;
+	        }
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav title">
+		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" style="color: white;"></a>
+		    <h1 class="mui-title title-color"><b>资料详情</b></h1> 
+		</header>
+		<div class="mui-content">
+
+		    <ul class="mui-table-view">
+		        <li class="mui-table-view-cell mui-media p-t-10">
+		            <a href="javascript:;">
+		                <img id="header_img" class="mui-media-object mui-pull-left" src=""
+		                	style="border-radius: 8%;line-height: 50px;max-width: 50px;height: 50px;margin-right: 15px;">
+		                <div class="mui-media-body">
+		                    <label id="nick_name">11</label>
+		                    <p  id="user_name" class="mui-ellipsis" style="margin-top: 6px;">111</p>
+		                </div>
+		            </a>
+		        </li>
+		    </ul>
+		</div>
+		<br />
+		<div style="text-align: center;">
+			<button id ="add_friend"class="mui-btn mui-btn-block" type="button" style=" color: white;width: 90%;display: inline;padding: 12px 0;">添加好友</button>		
+			<button id ="back" class="mui-btn mui-btn-block" type="button" style="width: 90%;display: inline;padding: 12px 0;">返回</button>			
+		</div>
+		<script src="js/mui.min.js"></script>
+		<script src="js/mui.min.js"></script>
+		<script src="js/app.js"></script>
+		<script type="text/javascript">
+			mui.init()
+			mui.plusReady(function(){
+				var thisWebview = plus.webview.currentWebview();
+				var friendInfo = thisWebview.friend;
+				document.getElementById("user_name").innerText="微聊号：" + friendInfo.username;
+				document.getElementById("nick_name").innerText=friendInfo.nickname;
+				document.getElementById("header_img").src=app.imgServerUrl + friendInfo.faceImage;
+				var userInfo = app.getUserGlobalInfo();
+				var addFrind = document.getElementById("add_friend");
+				addFrind.addEventListener("tap",function(){
+					plus.nativeUI.showWaiting();
+					mui.ajax(app.serverUrl + "/u/addFriendRequest?myUserId=" + userInfo.id + 
+											"&friendUsername=" + friendInfo.username,{
+						data:{},
+						dataType:'json',//服务器返回json格式数据
+						type:'post',//HTTP请求类型
+						timeout:10000,//超时时间设置为10秒；
+						headers:{'Content-Type':'application/json'},	              
+						success:function(data){
+							// 关闭等待框
+							plus.nativeUI.closeWaiting();
+							if (data.status == 200) {
+								// 页面跳转
+								app.showToast("好友请求已发送","success");
+								mui.openWindow("index.html","index.html");
+							} else {
+								app.showToast(data.msg, "error");
+							}
+						},
+						error:function(data){
+							plus.nativeUI.closeWaiting();
+							app.showToast("发送请求失败", "error");
+						}
+					});
+				});
+				var back = document.getElementById("back");
+				back.addEventListener("tap",function(){
+					mui.back();
+				});
+			});
+		</script>
+	</body>
+
+</html>

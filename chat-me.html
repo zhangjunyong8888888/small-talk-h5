@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+	</head>
+		<div class="mui-content">
+			<ul class="mui-table-view">
+			    <li class="mui-table-view-cell mui-media">
+			        <a id="link_herder_img" href="javascript:;">
+			        	<span class="mui-pull-right mui-icon mui-icon-arrowright"
+			        		style="line-height: 42px;color: lightgray;margin-left: 3px;"></span>
+			            <img id="img_header" class="mui-media-object mui-pull-right" src="image/face-default-cat.png">
+			            <div class="mui-media-body" style="line-height: 42px;font-size: 16px;">
+			                           头像
+			            </div>
+			        </a>
+			    </li>
+			    <li class="mui-table-view-cell mui-media">
+			        <a id="link_nick_name" href="javascript:;">
+			        	<span class="mui-pull-right mui-icon mui-icon-arrowright"
+			        		style="line-height: 42px;color: lightgray;margin-left: 3px;"></span>
+			        	<span id="span_nickname" class="mui-pull-right"
+			        		style="line-height: 46px;color:gray; font-size: 14px;"></span>
+			            <div class="mui-media-body" style="line-height: 42px;font-size: 16px;">
+			                           昵称
+			            </div>
+			        </a>
+			    </li>
+			    <li class="mui-table-view-cell mui-media">
+			        <a href="javascript:;">
+			        	<span id="span_username"class="mui-pull-right"
+			        		style="line-height: 46px;color:gray; font-size: 14px;margin-right: 10px;"></span>
+			            <div class="mui-media-body" style="line-height: 42px;font-size: 16px;">
+			                           账号
+			            </div>
+			        </a>
+			    </li>
+			    <li class="mui-table-view-cell mui-media">
+			        <a id ="link_qr_code" href="javascript:;">
+			        	<span class="mui-pull-right mui-icon mui-icon-arrowright"
+			        		style="line-height: 42px;color: lightgray;margin-left: 3px;"></span>
+			            <img class="mui-media-object mui-pull-right" style="max-width: 20px;height: 20px;margin-top: 11px;" src="image/qrcode.png">
+			            <div class="mui-media-body" style="line-height: 42px;font-size: 16px;">
+			            	我的二维码
+			            </div>
+			        </a>
+			    </li>
+			</ul>
+			<br />
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell mui-media">
+			        <a id="link_logout" href="javascript:;" style="text-align: center;color: red;">
+			            <div class="mui-media-body" style="line-height: 42px;font-size: 18px;">
+			                           退出登录
+			            </div>
+			        </a>
+			    </li>
+			</ul>
+		</div>
+	<body>
+		<script src="js/mui.min.js"></script>
+		<script src="js/app.js"></script>
+		<script type="text/javascript">
+			mui.init()
+			mui.plusReady(function(){
+				var currentWebview = plus.webview.currentWebview();
+				currentWebview.addEventListener("show",function(){
+					this.initUserInfo();
+				});
+				
+				//别的 webview 调用来刷新用户信息
+				window.addEventListener("refresh",function(){
+					initUserInfo();
+				});
+				
+				var linkHerderImg = document.getElementById("link_herder_img");
+				linkHerderImg.addEventListener("tap",function(){
+					mui.openWindow("chat-me-herder-img.html","chat-me-herder-img.html");
+				});
+				
+				var linkNickName = document.getElementById("link_nick_name");
+				linkNickName.addEventListener("tap",function(){
+					mui.openWindow("chat-me-nick-name.html","chat-me-nick-name.html");
+				});
+				
+				var linkQrCode = document.getElementById("link_qr_code");
+				linkQrCode.addEventListener("tap",function(){
+					mui.openWindow("chat-me-qr-code.html","chat-me-qr-code.html");
+				});
+				
+				var linkLogout = document.getElementById("link_logout");
+				linkLogout.addEventListener("tap",function(){
+					app.userLogout();
+					app.showToast("退出成功","success");
+					mui.openWindow("login.html","login.html");
+				});
+				
+			});
+			function initUserInfo(){
+				var userInfo = app.getUserGlobalInfo();
+				if(app.isNotNull(userInfo.faceImage)){ 
+					document.getElementById("img_header").src=app.imgServerUrl + userInfo.faceImage;	
+				}
+				document.getElementById("span_nickname").innerHTML=userInfo.nickname;
+				document.getElementById("span_username").innerHTML=userInfo.username;
+			}
+		</script>
+	</body>
+
+</html>
